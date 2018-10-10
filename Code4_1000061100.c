@@ -1,3 +1,5 @@
+/* Maria Maldonado 1000061100 */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,50 +7,41 @@
 
 #define MAX_INPUT 81
 
-int GuessALetter (char Phrase[], char PhraseCopy[])
+int GuessALetter (char Phrase[], char PhraseCopy[], char UpperPhrase[])
 {
-    char Guess, UpperGuess;
+    char Guess;
     char *FindGuess;
     FindGuess = NULL;
     char GuessALetterCopy[MAX_INPUT];
     int FoundALetter = 0;
-    int i;
 
-    strcpy(GuessALetterCopy, Phrase);
-    printf("%s", PhraseCopy);
+    strcpy(GuessALetterCopy, UpperPhrase);
+    printf("\n\n%s", PhraseCopy);
 
     printf("\n\nPlayer 2: Guess a letter: ");
+
     Guess = getchar();
     getchar();
+    Guess = toupper(Guess);
 
+    FindGuess = strchr(GuessALetterCopy, Guess);
 
-    if (Guess >= 97 & Guess <= 122){
-        UpperGuess = Guess ^ 32;
-    }
-    else
-        UpperGuess = Guess;
-
-    for (i = 0; i <= strlen(Phrase); i++){
-        if (GuessALetterCopy[i]>=97 & GuessALetterCopy[i]<=122)
-            GuessALetterCopy[i] = GuessALetterCopy[i] ^ 32;
-    }
-
-    FindGuess = strchr(GuessALetterCopy, UpperGuess);
-
-    while (FindGuess != NULL){
+    while (FindGuess != NULL)
+    {
         FoundALetter = 1;
         PhraseCopy[FindGuess - GuessALetterCopy] = Phrase[FindGuess - GuessALetterCopy];
         *FindGuess = '-';
-        FindGuess = strchr(GuessALetterCopy, UpperGuess);
+        FindGuess = strchr(GuessALetterCopy, Guess);
     }
+
     return FoundALetter;
 }
 
 int main (void)
 {
     char Phrase[MAX_INPUT];
-    char UpperPhrase[MAX_INPUT];
     char PhraseCopy[MAX_INPUT];
+    char UpperPhrase[MAX_INPUT];
     char Alphabet[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
     char *ReplaceIt;
@@ -69,51 +62,54 @@ int main (void)
 
     fgets(Phrase, MAX_INPUT, stdin);
 
-    if ((strchr(Phrase, '-')) != NULL){
-        printf("You broke the rules. We can't play. BYE!!");
+    if ((strchr(Phrase, '-')) != NULL)
+    {
+        printf("\nYou broke the rules. We can't play. BYE!!\n\n");
         exit(1);
     }
 
     Phrase[strlen(Phrase)-1] = '\0';
 
-    for (i = 0; i <= strlen(Phrase); i++){
-        if (Phrase[i]>=97 & Phrase[i]<=122)
-            UpperPhrase[i] = Phrase[i] ^ 32;
-        else
-            UpperPhrase[i] = Phrase[i];
+    for (i = 0; i <= strlen(Phrase); i++)
+    {
+        UpperPhrase[i] = toupper(Phrase[i]);
     }
 
     strcpy(PhraseCopy, UpperPhrase);
 
-    int j = 0;
-    while (j<strlen(PhraseCopy)){
+    ReplaceIt = strpbrk(PhraseCopy, Alphabet);
+
+    while (ReplaceIt != NULL)
+    {
+        *ReplaceIt = '-';
         ReplaceIt = strpbrk(PhraseCopy, Alphabet);
-        if (ReplaceIt != NULL)
-            *ReplaceIt = '-';
-        j++;
     }
 
     printf("\nPlayer 2 - Here's the phrase you need to guess\n\n" );
 
-    while ((strchr(PhraseCopy, '-') != NULL)){
-        GuessALetter(Phrase, PhraseCopy);
-        if (!((GuessALetter(Phrase, PhraseCopy)) && 0)){
+    do
+    {
+        if (GuessALetter(Phrase, PhraseCopy, UpperPhrase) == 0)
+        {
             Strikes++;
-            printf("Strike ");
+            printf("\nStrike ");
             ConvertDecimalToBinary(Strikes);
-            if (Strikes >= YourOut){
+            if (Strikes >= YourOut)
+            {
+                printf("\n\n");
                 ConvertDecimalToBinary(Strikes);
-                printf("STRIKES - YOU'RE OUT!!");
-                printf("Game over");
+                printf(" STRIKES - YOU'RE OUT!!\n");
+                printf("\nGame over\n\n");
                 return 0;
             }
         }
     }
+    while ((strchr(PhraseCopy, '-') != NULL));
 
-      printf("You figured it out!!\n");
-      printf("Player 1 entered the phrase ");
-      printf("%s\n", Phrase);
-      printf("Player 2 WINS!!!!");
+    printf("\n\nYou figured it out!!\n");
+    printf("\nPlayer 1 entered the phrase\n ");
+    printf("\n%s\n", Phrase);
+    printf("\nPlayer 2 WINS!!!!\n\n");
 
       return 0;
 }
